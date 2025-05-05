@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo/components/todo_item.dart';
+import 'package:todo/types/todo_task.dart';
 
 const colors = [
   Color.fromARGB(255, 225, 0, 0),
@@ -19,17 +20,30 @@ class HomeBody extends StatefulWidget {
 }
 
 class _HomeBodyState extends State<HomeBody> {
+  final List<TodoTask> todoTasks = [];
+
   void onPressed() {
-    int index = todoItems.length;
-    Color getItemColor = colors.elementAt(index % colors.length);
+    int index = todoTasks.length;
     setState(() {
-      todoItems.add(
-        TodoItem(title: "Todo ${todoItems.length + 1}", color: getItemColor),
+      todoTasks.add(
+        TodoTask(
+          title: "",
+          description: "Description",
+          color: colors.elementAt(index % colors.length),
+          createdAt: DateTime.now(),
+        ),
       );
     });
   }
 
-  final List<TodoItem> todoItems = [];
+  void _updateTodoTask(int index, TodoTask updatedTask) {
+    setState(() {
+      todoTasks[index] = updatedTask;
+    });
+
+    // Future: Add logic here to update the database or local storage
+    // Example: await database.updateTodoTask(updatedTask);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +54,13 @@ class _HomeBodyState extends State<HomeBody> {
         children: [
           Expanded(
             child: ListView.separated(
-              itemCount: todoItems.length,
-              itemBuilder: (context, index) => todoItems[index],
+              itemCount: todoTasks.length,
+              itemBuilder:
+                  (context, index) => TodoItem(
+                    todoTask: todoTasks[index],
+                    onChange:
+                        (updatedTask) => _updateTodoTask(index, updatedTask),
+                  ),
               separatorBuilder: (context, index) => const SizedBox(height: 10),
             ),
           ),
